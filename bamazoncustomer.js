@@ -46,41 +46,90 @@ function questions() {
         type: "input",
         message: "How many of this item do you want?"
     }]).then(function (answer) {
+        console.log("this is the answer:");
+        console.log(answer);
+
 
         let idChosen = answer.product;
         let quantityChosen = answer.quantity;
+        // validateItemId();
 
-        //select product name, price, and stock quantity from the products table for the specific item id that was chosen.
-        connection.query('SELECT product_name, price, stock_quantity FROM products WHERE item_id =' + idChosen,
-            function (error, results) {
+        // function validateItemId() {
+        //     // var x = document.forms["myForm"]["fname"].value;
+        //     // if (x == "") {
+        //     //     alert("Name must be filled out");
+        //     //     return false;
+        //     // }
+        //     if (answer.product == NaN || answer.product > 10) {
+        //         console.log("please enter a valid item id");
+        //         // questions();
+        //         chooseAnotherItem();
 
-                // newQuantity is set to equal to the current inventory amount minus the quantity of item the user selects
-                let newQuantity = results[0].stock_quantity - quantityChosen;
-                //if stock_quantity is less what than what the user wants to buy, console.log that there isnt enough inventory. 
-                if (results[0].stock_quantity < quantityChosen) {
-                    console.log("There is not enough of this item to fulfill your order.")
-                    questions();
+        //     }
 
-                } else {
-                    //if the amount of items is available to buy, the products table will update the quantity to reflect your purchase
-                    connection.query("UPDATE products SET? WHERE?", [{
-                        stock_quantity: newQuantity
-                    }, {
-                        item_id: idChosen
-                    }]);
-                    //console logs which will display the total cost of your order given the user input for quantity of items purchased and name of product purchased
-                    if (quantityChosen === "1") {
-                        console.log("Your total is: $" + results[0].price * quantityChosen + ". You have purchased " + quantityChosen + " " + results[0].product_name);
 
+        // }
+
+
+        // function vali
+        if (answer.product == "" || answer.product > 10) {
+            console.log("please enter a valid item id");
+            // questions();
+            chooseAnotherItem();
+
+        } else {
+
+            //select product name, price, and stock quantity from the products table for the specific item id that was chosen.
+            connection.query('SELECT product_name, price, stock_quantity FROM products WHERE item_id =' + idChosen,
+                function (error, results) {
+
+
+                    // newQuantity is set to equal to the current inventory amount minus the quantity of item the user selects
+                    let newQuantity = results[0].stock_quantity - quantityChosen;
+                    //if stock_quantity is less what than what the user wants to buy, console.log that there isnt enough inventory, then ask user if they want to 'chooseAnotherItem();' . 
+                    if (results[0].stock_quantity < quantityChosen) {
+                        console.log("There is not enough of this item to fulfill your order.")
+                        // questions();
+                        chooseAnotherItem();
                     } else {
-                        console.log("Your total is: $" + results[0].price * quantityChosen + ". You have purchased " + quantityChosen + " " + results[0].product_name + "s");
-
+                        //if the amount of items is available to buy, the products table will update the quantity to reflect your purchase
+                        connection.query("UPDATE products SET? WHERE?", [{
+                            stock_quantity: newQuantity
+                        }, {
+                            item_id: idChosen
+                        }]);
+                        //console logs which will display the total cost of your order given the user input for quantity of items purchased and name of product purchased
+                        if (quantityChosen === "1") {
+                            console.log("Your total is: $" + results[0].price * quantityChosen + ". You have purchased " + quantityChosen + " " + results[0].product_name);
+                            //after the purchase, the user will be asked if they want to continue with another purchase or 'Quit' the app. 
+                            chooseAnotherItem();
+                        } else {
+                            console.log("Your total is: $" + results[0].price * quantityChosen + ". You have purchased " + quantityChosen + " " + results[0].product_name + "s");
+                            //after the purchase, the user will be asked if they want to continue with another purchase or 'Quit' the app. 
+                            chooseAnotherItem();
+                        }
                     }
-                }
-            });
+                });
+        }
     });
+
 }
 
+//function that runs at the end of each purchase. function asks user if they would like to continue with another purchase or to 'Quit' the app. 
+function chooseAnotherItem() {
+    inquirer.prompt([{
+        name: "product",
+        type: "input",
+        message: "Would you like to purchase more items?? If Yes, press 'Enter' to continue.(if No, enter 'Q' to Quit.)"
+    }]).then(function (answer) {
+        //checks if the user chose to Quit the app or proceed to be asked the questions(); again to purchase more items. 
+        if (answer.product.toUpperCase() == "Q") {
+            process.exit();
+        } else {
+            questions();
+        };
+    });
+};
 
 
 
