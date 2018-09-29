@@ -46,38 +46,16 @@ function questions() {
         type: "input",
         message: "How many of this item do you want?"
     }]).then(function (answer) {
-        console.log("this is the answer:");
-        console.log(answer);
-
 
         let idChosen = answer.product;
         let quantityChosen = answer.quantity;
-        // validateItemId();
-
-        // function validateItemId() {
-        //     // var x = document.forms["myForm"]["fname"].value;
-        //     // if (x == "") {
-        //     //     alert("Name must be filled out");
-        //     //     return false;
-        //     // }
-        //     if (answer.product == NaN || answer.product > 10) {
-        //         console.log("please enter a valid item id");
-        //         // questions();
-        //         chooseAnotherItem();
-
-        //     }
-
-
-        // }
-
-
-        // function vali
-        if (answer.product == "" || answer.product > 10) {
+        let specChars = /\D/g;
+        //user input validation. letters and all special characters will not be accepted. 
+        if (idChosen == "" || idChosen > 10 || idChosen.match(specChars) || quantityChosen == "" || quantityChosen > 10 || quantityChosen.match(specChars)) {
             console.log("please enter a valid item id");
-            // questions();
-            chooseAnotherItem();
+            questions();
 
-        } else {
+        } else if (answer.product <= 10) {
 
             //select product name, price, and stock quantity from the products table for the specific item id that was chosen.
             connection.query('SELECT product_name, price, stock_quantity FROM products WHERE item_id =' + idChosen,
@@ -89,7 +67,6 @@ function questions() {
                     //if stock_quantity is less what than what the user wants to buy, console.log that there isnt enough inventory, then ask user if they want to 'chooseAnotherItem();' . 
                     if (results[0].stock_quantity < quantityChosen) {
                         console.log("There is not enough of this item to fulfill your order.")
-                        // questions();
                         chooseAnotherItem();
                     } else {
                         //if the amount of items is available to buy, the products table will update the quantity to reflect your purchase
@@ -126,7 +103,7 @@ function chooseAnotherItem() {
         if (answer.product.toUpperCase() == "Q") {
             process.exit();
         } else {
-            questions();
+            display();
         };
     });
 };
