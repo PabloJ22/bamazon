@@ -1,4 +1,4 @@
-# bamazon
+# Bamazon
 
 Bamazon Store
 
